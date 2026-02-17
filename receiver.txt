@@ -1,0 +1,56 @@
+#include <SPI.h>
+#include <LoRa.h>
+
+// LoRa and SPI pins for ESP32-S2
+#define LORA_SS    5
+#define LORA_RST   4
+#define LORA_DIO0  2
+#define LORA_SCK   18
+#define LORA_MISO  19
+#define LORA_MOSI  21
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);
+
+  Serial.println("LoRa Receiver (ESP32-S2)");
+
+  // Initialize SPI bus
+  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_SS);
+  LoRa.setPins(LORA_SS, LORA_RST, LORA_DIO0);
+
+  // Initialize LoRa
+  if (!LoRa.begin(433E6)) {
+    Serial.println("LoRa initialization failed!");
+    while (1);
+  }
+
+  // Set sync word to match transmitter
+  LoRa.setSyncWord(0xA5);
+  Serial.println("LoRa ready! Listening for packets...");
+}
+
+void loop() {
+  // Try to parse packet
+  int packetSize = LoRa.parsePacket();
+  if (packetSize) {
+    String receivedData = "";
+    
+    // Read packet
+    while (LoRa.available()) {
+      receivedData += (char)LoRa.read();
+    }
+    
+    // Get RSSI
+    int rssi = LoRa.packetRssi();
+    
+    // Print received data
+    Serial.println("\n--- Received Packet ---");
+    Serial.print("Data: ");
+    Serial.println(receivedData);
+    Serial.print("RSSI: ");
+    Serial.print(rssi);
+    Serial.println(" dBm");
+    Serial.println("----------------------\n");
+  }
+} 
