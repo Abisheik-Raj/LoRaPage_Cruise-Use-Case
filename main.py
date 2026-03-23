@@ -1,34 +1,56 @@
 import serial
 import time
+from datetime import datetime
 
-SERIAL_PORT = 'COM4'  
+SERIAL_PORT = 'COM4'
 BAUD_RATE = 115200
-TIMEOUT = 1  
+TIMEOUT = 1
+
+def log(message):
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    print(f"[{timestamp}] {message}")
 
 def main():
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-        print(f"Connected to {SERIAL_PORT} at {BAUD_RATE} baud")
-        print("Enter messages to send (type 'exit' to quit):")
-        
+        log(f"Connected to {SERIAL_PORT} at {BAUD_RATE} baud")
+        print("Type message (format: ID:message) or 'exit'")
+
         while True:
             user_input = input("> ")
+
             if user_input.lower() == 'exit':
                 break
-                
-            ser.write((user_input + '\n').encode('utf-8'))
-            print(f"Sent: {user_input}")
-            
+
+            # Expect input like: 101:Hello
+            if ":" not in user_input:
+                print("Invalid format. Use ID:message")
+                continue
+
+            msg = "MSG:" + user_input
+            ser.write((msg + '\n').encode())
+
+            log(f"Sent → {msg}")
+
             time.sleep(0.1)
-            while ser.in_waiting > 0: 
-                response = ser.readline().decode('utf-8').strip()
-                if response:
-                    print(f"Response: {response}")
-                    
+
+            while ser.in_waiting > 0:
+                response = ser.readline().decode().strip()
+
+                if response.startswith("RPLY"):
+                    parts = response.split(":")
+                    if len(parts) == 3:
+                        _, rid, ans = parts
+                        log(f"📩 Reply from Device {rid} → {ans}")
+                elif response:
+                    log(f"Device: {response}")
+
     except serial.SerialException as e:
         print(f"Error: {e}")
+
     except KeyboardInterrupt:
         print("\nExiting...")
+
     finally:
         if 'ser' in locals() and ser.is_open:
             ser.close()
