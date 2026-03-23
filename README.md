@@ -25,39 +25,38 @@ LoRaPage provides a decentralized communication system where a central node tran
 
 ---
 
-## 🧠 System Architecture
+## 🧠 System Architecture# 🧠 System Architecture
 
-                ┌──────────────────────────┐
-                │    Central Computer      │
-                │   (User Interface)       │
-                └────────────┬─────────────┘
-                             │
-                    Serial Communication
-                             │
-                             ▼
-                ┌──────────────────────────┐
-                │   ESP32 Transmitter      │
-                │  + LoRa (RA-02 Module)   │
-                └────────────┬─────────────┘
-                             │
-                LoRa Communication (433 MHz)
-                             │
-    ─────────────────────────┼─────────────────────────
-                             │
-     ┌───────────────────────┴───────────────────────┐
-     ▼                                               ▼
-
-┌──────────────────────────┐ ┌──────────────────────────┐
-│ Receiver Device 1 │ │ Receiver Device N │
-│ ESP32 + LoRa + TFT │ │ ESP32 + LoRa + TFT │
-│ + Buttons (YES / NO) │ │ + Buttons (YES / NO) │
-└────────────┬─────────────┘ └────────────┬─────────────┘
-│ │
-LoRa Reply LoRa Reply
-│ │
-└────────────── Back to Transmitter ─────────────┘
-
----
+```
+                    ┌──────────────────────────┐
+                    │    Central Computer      │
+                    │   (User Interface)       │
+                    └────────────┬─────────────┘
+                                 │
+                        Serial Communication
+                                 │
+                                 ▼
+                    ┌──────────────────────────┐
+                    │   ESP32 Transmitter      │
+                    │  + LoRa (RA-02 Module)   │
+                    └────────────┬─────────────┘
+                                 │
+                    LoRa Communication (433 MHz)
+                                 │
+        ─────────────────────────┼─────────────────────────
+                                 │
+         ┌───────────────────────┴───────────────────────┐
+         ▼                                               ▼
+┌──────────────────────────┐                 ┌──────────────────────────┐
+│   Receiver Device 1      │                 │   Receiver Device N      │
+│  ESP32 + LoRa + TFT      │                 │  ESP32 + LoRa + TFT      │
+│  + Buttons (YES / NO)    │                 │  + Buttons (YES / NO)    │
+└────────────┬─────────────┘                 └────────────┬─────────────┘
+             │                                               │
+        LoRa Reply                                       LoRa Reply
+             │                                               │
+             └────────────── Back to Transmitter ─────────────┘
+```
 
 ## 🔄 Working Principle
 
